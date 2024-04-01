@@ -1,10 +1,19 @@
 export type ObjectValues<T> = T[keyof T];
 
+export const MENU_ITEM_DRINK_TYPES = {
+  iced: "Iced",
+  hot: "Hot",
+  either: "Either"
+} as const;
+
+export type MenuItemDrinkTypes = ObjectValues<typeof MENU_ITEM_DRINK_TYPES>;
+
 export type MenuItem = {
   id?: string;
   name: string;
   description: string;
   price?: number;
+  drinkTypes: MenuItemDrinkTypes;
 };
 
 export const ORDER_STATUS = {
