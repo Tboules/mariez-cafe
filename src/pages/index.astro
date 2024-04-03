@@ -1,115 +1,69 @@
 ---
-import { getFirestore } from 'firebase-admin/firestore';
-import Layout from '../layouts/Layout.astro';
-import { app } from '../firebase/server';
-import type { MenuItem } from '../types';
+import { getFirestore } from "firebase-admin/firestore";
+import Layout from "../layouts/Layout.astro";
+import { app } from "../firebase/server";
+import type { MenuItem } from "../types";
 
-const db = getFirestore(app)
+const db = getFirestore(app);
 
-// const menuItem: MenuItem = {
-//   name: 'test item',
-//   description: 'testing item description',
-//   price: 5,
-//   drinkTypes: 'Hot'
-// }
+const menuItemsRef = db.collection('menuItems');
 
-const menuItems: MenuItem[] = [
-  {
-    name: 'Toffee Nut Latte',
-    description: 'sweet and condensed milk latte with notes of caramel topped with bits of toffee nut pieces',
-    drinkTypes: 'Either',
-    price: 5
-  },
-  {
-    name: 'Vanilla Creme Latte',
-    description: 'vanilla syrup latte with white chocolate notes',
-    drinkTypes: 'Either',
-    price: 5
-  },
-  {
-    name: 'Caramel Creme Latte',
-    description: 'caramel syrup latte with slight caramel drizzle',
-    drinkTypes: 'Either',
-    price: 5
-  },
-  {
-    name: 'Spanish Latte',
-    description: 'sweet and condensed milk with a dash of cinnamon',
-    drinkTypes: 'Either',
-    price: 5
-  },
-  {
-    name: 'Churro Latte',
-    description: 'dulce de leche with cinnamon syrup',
-    drinkTypes: 'Either',
-    price: 5
-  },
-  {
-    name: 'Brown Sugar Latte',
-    description: 'brown sugar syrup with bold espresso and oat milk',
-    drinkTypes: 'Either',
-    price: 5
-  },
-  {
-    name: 'Tiramusu Latte',
-    description: 'bold espresso with tiramisu syrup topped with mascarpone sweet cream,and cocoa powder',
-    drinkTypes: 'Either',
-    price: 5
-  },
-  {
-    name: 'Hot Chocolate',
-    description: 'Steamed milk with chocolate, topped with whipped cream',
-    drinkTypes: 'Hot',
-    price: 5
-  },
-  {
-    name: 'Green Tea',
-    description: 'Hot or iced green tea, sweetened to your liking',
-    drinkTypes: 'Either',
-    price: 5
-  },
-  {
-    name: 'Black Tea',
-    description: 'Hot or iced black tea, sweetened to your liking',
-    drinkTypes: 'Either',
-    price: 5
-  },
-  {
-    name: 'Vanilla Matcha Latte', 
-    description: 'vanilla syrup matcha latte',
-    drinkTypes: 'Either',
-    price: 5
-  },
-  {
-    name: 'Strawberry Matcha Latte',
-    description: 'strawberry syrup matcha latte',
-    drinkTypes: 'Either',
-    price: 5
-  },
-  {
-    name: 'Strawberry Acai Refresher',
-    description: 'sweet strawberry flavors accented by passion fruit and açaí notes balanced with a choice of water, tea, or lemonade',
-    drinkTypes: 'Iced',
-    price: 5
-  },
-  {
-    name: 'Pineapple Mango Refresher',
-    description: 'sweet tropical flavors of mango and pineapple balanced with a choice of water, tea, or lemonade',
-    drinkTypes: 'Iced',
-    price: 5
-  }
-]
+const menuItemsSnapshot = await menuItemsRef.get()
+const menuItems: MenuItem[] = [];
 
-// const res = await db.collection('menuItems').add({menuItem})
+menuItemsSnapshot.forEach((doc) => {
+  const menuItem = {
+    ...doc.data(),
+    id: doc.id
+  } as MenuItem
+
+
+  menuItems.push(menuItem)
+})
 ---
 
 <Layout title="Mariez' Cafe">
   <h1>Mariez' Cafe</h1>
-  <pre>
-    <!-- {JSON.stringify(res, null, 2)} -->
-  </pre>
+  
+  <ul class='menu-item-list'>
+    {menuItems.map(item => (
+      <li class='menu-item'>
+        <a href={`/order?drinkId=${item.id}`}>
+          <h3>{item.name}</h3>
+          <p>{item.description}</p>
+        </a>
+      </li>
+    ))}
+  </ul>
+
+    
 </Layout>
 
+<style>
+  .menu-item-list {
+    display: grid;
+    list-style-type: none;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+  }
 
 
+  .menu-item {
+    border: 1px solid black;
+    border-radius: .25rem;
+  }
 
+  .menu-item a {
+    box-sizing: border-box;
+    padding: 1rem;
+    color: black;
+    display: block;
+    width: 100%;
+    height: 100%;
+    text-decoration: none;
+  }
+</style>
+
+<script>
+  import { collection, addDoc } from "firebase/firestore";
+</script>

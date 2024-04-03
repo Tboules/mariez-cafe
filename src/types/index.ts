@@ -3,7 +3,7 @@ export type ObjectValues<T> = T[keyof T];
 export const MENU_ITEM_DRINK_TYPES = {
   iced: "Iced",
   hot: "Hot",
-  either: "Either"
+  either: "Either",
 } as const;
 
 export type MenuItemDrinkTypes = ObjectValues<typeof MENU_ITEM_DRINK_TYPES>;
