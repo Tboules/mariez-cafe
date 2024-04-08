@@ -6,144 +6,111 @@ import type { MenuItem } from "../types";
 
 const db = getFirestore(app);
 
-const menuItemsRef = db.collection('menuItems');
+const menuItemsRef = db.collection("menuItems");
 
-const menuItemsSnapshot = await menuItemsRef.get()
+const menuItemsSnapshot = await menuItemsRef.get();
 const menuItems: MenuItem[] = [];
 
 menuItemsSnapshot.forEach((doc) => {
   const menuItem = {
     ...doc.data(),
-    id: doc.id
-  } as MenuItem
+    id: doc.id,
+  } as MenuItem;
 
-
-  menuItems.push(menuItem)
-})
+  menuItems.push(menuItem);
+});
 ---
 
 <Layout title="Uplifted Coffee">
-
   <header class="header">
     <div class="container">
-        <img src="/img/header.png" alt="">
+      <img src="/img/header.png" alt="" />
     </div>
-</header>
-  
-  <ul class='menu-item-list'>
-    {menuItems.map(item => (
-      <li class='menu-item'>
-        <a href={`/order?drinkId=${item.id}`}>
-          <h3>{item.name}</h3>
-          <p>{item.description}</p>
-        </a>
-      </li>
-    ))}
+  </header>
+
+  <ul class="menu-item-list">
+    {
+      menuItems.map((item) => (
+        <li class="menu-item">
+          <a href={`/order?drinkId=${item.id}`}>
+            <h3>{item.name}</h3>
+            <p>{item.description}</p>
+          </a>
+        </li>
+      ))
+    }
   </ul>
 
   <!-- <footer><p>Footer</p></footer> -->
 </Layout>
 
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
-
-  body {
-    /* font-family: 'Poppins', sans-serif; */
-    font-size: 16px;
-    line-height: 1.5;
-    color: #5B3720;
-    background:#D9BEA9;
-  }
-
-  h1 {
-    margin-bottom: 15px;
-  }
-
-  h3 {
-
-  }
-
   .container {
     max-width: 1100px;
-    margin: 0 auto;
-    padding: 0 30px;
-}
+    margin: 1rem auto;
+    padding: 0 1rem;
+  }
 
   .menu-item-list {
     display: grid;
     list-style-type: none;
     grid-template-columns: repeat(3, 1fr);
-    gap: 1rem;
-    
+    gap: 1.5rem;
+
     padding: 1rem;
-    height: 4rem;
-    max-width: 1200px;
+    max-width: 1100px;
     margin: 0 auto;
     display: grid;
-    gap: 1rem;
+    margin-bottom: 4rem;
   }
 
-
   .menu-item {
-    background: #FDEEE2;
-    border: 1px solid #914F26;
+    background: #fdeee2;
+    border: 1px solid #914f26;
     border-radius: 10px;
     box-shadow: 0 3px 5px rgba(0, 0, 0, 0.6);
-    margin: 20px 10px;
-    padding: 15px 20px;
+    padding: 1rem;
 
     max-width: 960px;
-    /* display: grid; */
+  }
 
-    /* padding: 1rem;
-    height: 4rem;
-    max-width: 1200px;
-    margin: 0 auto;
-    display: grid;
-    gap: 1rem; */
+  .menu-item:hover {
+    transform: translateY(2px);
   }
 
   .menu-item a {
     box-sizing: border-box;
-    padding: 1rem;
-    color: #5B3720;
+    color: #5b3720;
     display: block;
     width: 100%;
     height: 100%;
     text-decoration: none;
   }
 
-/* .header h1 {
-    font-size: 3rem;
-    font-weight: bold;
-    line-height: 1.2;
-} */
-
-.header img {
+  .header img {
     max-width: 100%;
-    margin-top: 20px;
-}
+  }
 
-.header .container {
+  .header .container {
     display: flex;
     align-items: center;
     justify-content: space-between;
-}
-
-.footer {
-  left: 0;
-  bottom: 0;
-  width: 100%;
-}
-
-@media(max-width: 500px) {
-  .menu-item {
-    grid-template-columns: 1fr;
-    /* grid-template-columns: repeat(2, 1fr); */
   }
-}
-</style>
 
-<script>
-  import { collection, addDoc } from "firebase/firestore";
-</script>
+  .footer {
+    left: 0;
+    bottom: 0;
+    width: 100%;
+  }
+  @media (max-width: 768px) {
+    .menu-item-list {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 500px) {
+    .menu-item-list {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
