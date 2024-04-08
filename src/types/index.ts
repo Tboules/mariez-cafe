@@ -25,8 +25,8 @@ export const ORDER_STATUS = {
 export type OrderStatus = ObjectValues<typeof ORDER_STATUS>;
 
 export const ORDER_OPTIONS_TYPE = {
-  hot: "hot",
-  iced: "iced",
+  hot: "Hot",
+  iced: "Iced",
 } as const;
 
 export type OrderOptionsType = ObjectValues<typeof ORDER_OPTIONS_TYPE>;

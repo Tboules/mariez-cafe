@@ -1,10 +1,77 @@
 ---
-import Layout from "../../layouts/Layout.astro"
+import { getFirestore } from "firebase-admin/firestore";
+import { app } from "../../firebase/server";
+import Layout from "../../layouts/Layout.astro";
+import {
+  ORDER_OPTIONS_MILK,
+  ORDER_OPTIONS_TYPE,
+  type MenuItem,
+} from "../../types";
 
-const blegh = Astro.url.searchParams.get('drinkId')
-console.log(blegh)
+const drinkId = Astro.url.searchParams.get("drinkId");
+if (!drinkId) {
+  console.log("no drink id");
+  return Astro.redirect("/");
+}
+
+const db = getFirestore(app);
+const drinkRef = await db.collection("menuItems").doc(drinkId).get();
+
+const drink = (await drinkRef.data()) as MenuItem | undefined;
+
+if (!drink) {
+  return Astro.redirect("/");
+}
+
+console.log(drink);
 ---
 
-<Layout title='Order Page'>
-  <h1>Order Page</h1>
+<Layout title="Order Page">
+  <main class="wrapper">
+    <h1>{drink.name}</h1>
+    {drink.drinkTypes == "Hot" && <h4>*Hot Drink</h4>}
+    {drink.drinkTypes == "Iced" && <h4>*Iced Drink</h4>}
+
+    <form action="">
+      <div class="form-input">
+        <label>Ordered By:</label>
+        <input type="text" name="orderedBy" placeholder="Your Name" />
+      </div>
+      {
+        drink.drinkTypes == "Either" && (
+          <div class="form-input">
+            <label>Drink Type:</label>
+            <select name="orderOptionsType">
+              {Object.values(ORDER_OPTIONS_TYPE).map((type) => (
+                <option value={type}>{type}</option>
+              ))}
+            </select>
+          </div>
+        )
+      }
+
+      <div class="form-input">
+        <label>Milk:</label>
+        <select name="orderOptionsMilk">
+          {
+            Object.values(ORDER_OPTIONS_MILK).map((milkType) => (
+              <option value={milkType}>{milkType}</option>
+            ))
+          }
+        </select>
+      </div>
+    </form>
+  </main>
 </Layout>
+
+<style>
+  .wrapper {
+    margin: 0 auto;
+    max-width: 900px;
+    padding: 1rem;
+  }
+  .form-input {
+    display: flex;
+    flex-direction: column;
+  }
+</style>
