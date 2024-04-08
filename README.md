@@ -11,3 +11,11 @@
    4. Set Up DB Library
    5. Set Up UI Infrastructure
    6. Set Up Nav Structure
+
+### TODOS
+
+- [x] create schema
+- [x] create menu items
+- [ ] create form to put in order
+- [ ] create admin menu to see orders
+- [ ] create functionality to update order status when done
