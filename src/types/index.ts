@@ -14,6 +14,9 @@ export type MenuItem = {
   description: string;
   price?: number;
   drinkTypes: MenuItemDrinkTypes;
+  milk: boolean;
+  isRefresher?: boolean;
+  isTea?: boolean;
 };
 
 export const ORDER_STATUS = {
@@ -39,10 +42,21 @@ export const ORDER_OPTIONS_MILK = {
 
 export type OrderOptionsMilk = ObjectValues<typeof ORDER_OPTIONS_MILK>;
 
+export const ORDER_OPTIONS_REFRESHER = {
+  original: "Original",
+  greenTea: "Green Tea",
+  blackTea: "Black Tea",
+  lemonade: "Lemonade",
+  appleJuice: "Apple Juice",
+} as const;
+
+export type OrderOptionsRefresher = ObjectValues<typeof ORDER_OPTIONS_REFRESHER>;
+
 export const ORDER_OPTIONS_SWEETNESS = {
   regular: "Regular",
   half: "Half",
   extra: "Extra",
+  none: "None",
 } as const;
 
 export type OrderOptionsSweetness = ObjectValues<
@@ -50,6 +64,7 @@ export type OrderOptionsSweetness = ObjectValues<
 >;
 
 export const ORDER_OPTIONS_TOPPINGS = {
+  none: "None",
   whipCream: "Whipped Cream",
   sweetCream: "Coconut Sweet Cream",
 } as const;

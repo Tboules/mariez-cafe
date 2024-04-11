@@ -4,9 +4,12 @@ import { app } from "../../firebase/server";
 import Layout from "../../layouts/Layout.astro";
 import {
   ORDER_OPTIONS_MILK,
+  ORDER_OPTIONS_REFRESHER,
   ORDER_OPTIONS_TYPE,
   type MenuItem,
+ORDER_OPTIONS_SWEETNESS,
 } from "../../types";
+import { ORDER_OPTIONS_TOPPINGS } from "../../types";
 
 const drinkId = Astro.url.searchParams.get("drinkId");
 if (!drinkId) {
@@ -50,16 +53,62 @@ console.log(drink);
         )
       }
 
-      <div class="form-input">
-        <label>Milk:</label>
-        <select name="orderOptionsMilk">
-          {
-            Object.values(ORDER_OPTIONS_MILK).map((milkType) => (
-              <option value={milkType}>{milkType}</option>
-            ))
-          }
-        </select>
-      </div>
+      {
+        drink.milk == true && (
+          <div class="form-input">
+            <label>Milk:</label>
+            <select name="orderOptionsMilk">
+              {Object.values(ORDER_OPTIONS_MILK).map((milkType) => (
+                <option value={milkType}>{milkType}</option>
+               ))}
+            </select>
+          </div>
+        )
+      }
+
+      {
+          drink.isRefresher == true && (
+            <div class="form-input">
+              <label>Base:</label>
+              <select name="orderOptionsRefresher">
+                {Object.values(ORDER_OPTIONS_REFRESHER).map((base) => (
+                  <option value={base}>{base}</option>
+                ))}
+              </select>
+            </div>
+          )
+      }
+
+      {
+        drink.isRefresher == null && (
+            <div class="form-input">
+            <label>Sweetness:</label>
+            <select name="orderOptionsSweetness">
+              {
+                Object.values(ORDER_OPTIONS_SWEETNESS).map((sweetnessLevel) => (
+                  <option value={sweetnessLevel}>{sweetnessLevel}</option>
+                ))
+              }
+            </select>
+          </div>
+        )
+      }
+
+      {
+        drink.isTea == null && (
+          <div class="form-input">
+          <label>Toppings:</label>
+          <select name="orderOptionsToppings">
+            {
+              Object.values(ORDER_OPTIONS_TOPPINGS).map((toppings) => (
+                <option value={toppings}>{toppings}</option>
+              ))
+            }
+          </select>
+        </div>
+        )
+      }
+      <button class="button">Submit</button>
     </form>
   </main>
 </Layout>
@@ -73,5 +122,22 @@ console.log(drink);
   .form-input {
     display: flex;
     flex-direction: column;
+    /* background-color: #fdeee2; */
   }
+
+  .button {
+    margin-top: 10px;
+    background: #5b3720;
+    border-radius: 10px;
+    color: #d9bea9;
+  }
+
+  /* color: #5b3720;
+    background: #d9bea9;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Lato", sans-serif;
+    font-weight: 300;
+    font-style: normal; */
 </style>
