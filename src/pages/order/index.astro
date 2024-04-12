@@ -121,6 +121,10 @@ if (!drink) {
 
 <script>
   import type { MenuItem, Order, OrderOptionsType, OrderOptionsMilk, OrderOptionsRefresher, OrderOptionsToppings, OrderOptionsSweetness } from "../../types";
+  import { clientDb } from "../../firebase/client";
+  import { collection, addDoc } from "firebase/firestore";
+
+
   class OrderForm extends HTMLElement {
     constructor() {
       super();
@@ -133,6 +137,13 @@ if (!drink) {
         const formData = new FormData(orderForm)
 
         const orderedBy = formData.get('orderedBy') as string
+        
+        if(orderedBy == ''){
+          alert('Name must be filled out')
+          return;
+        }
+
+
         const type = formData.get('orderOptionsType') as OrderOptionsType | null;
         const milk = formData.get('orderOptionsMilk') as OrderOptionsMilk | null;
         const refresherType = formData.get('orderOptionsRefresher') as OrderOptionsRefresher | null;
@@ -155,7 +166,10 @@ if (!drink) {
         }
 
 
-        console.log(order)
+        const docRef = await addDoc(collection(clientDb, 'orders'), order);
+
+        
+        window.location.replace(`/thankyou?orderId=${docRef.id}`)
       })
 
     }
@@ -187,5 +201,7 @@ if (!drink) {
     width: 100%;
     padding: .5rem;
   }
+
+  
 
 </style>
