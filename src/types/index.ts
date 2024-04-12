@@ -50,7 +50,9 @@ export const ORDER_OPTIONS_REFRESHER = {
   appleJuice: "Apple Juice",
 } as const;
 
-export type OrderOptionsRefresher = ObjectValues<typeof ORDER_OPTIONS_REFRESHER>;
+export type OrderOptionsRefresher = ObjectValues<
+  typeof ORDER_OPTIONS_REFRESHER
+>;
 
 export const ORDER_OPTIONS_SWEETNESS = {
   regular: "Regular",
@@ -72,15 +74,17 @@ export const ORDER_OPTIONS_TOPPINGS = {
 export type OrderOptionsToppings = ObjectValues<typeof ORDER_OPTIONS_TOPPINGS>;
 
 export type OrderOptions = {
-  type: OrderOptionsType;
-  milk: OrderOptionsMilk;
-  sweetness: OrderOptionsSweetness;
-  toppings: OrderOptionsToppings;
+  type: OrderOptionsType | null;
+  milk: OrderOptionsMilk | null;
+  refresherType: OrderOptionsRefresher | null;
+  sweetness: OrderOptionsSweetness | null;
+  toppings: OrderOptionsToppings | null;
 };
 
 export type Order = {
   id?: string;
-  orderItem: string;
+  orderItemId?: string;
+  orderItemName: string;
   orderedBy: string;
   status: OrderStatus;
   createdAt: Date;
