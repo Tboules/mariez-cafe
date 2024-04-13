@@ -16,6 +16,6 @@
 
 - [x] create schema
 - [x] create menu items
-- [ ] create form to put in order
+- [x] create form to put in order
 - [ ] create admin menu to see orders
 - [ ] create functionality to update order status when done
