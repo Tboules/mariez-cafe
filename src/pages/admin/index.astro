@@ -2,12 +2,109 @@
 import { getFirestore } from "firebase-admin/firestore";
 import Layout from "../../layouts/Layout.astro";
 import { app } from "../../firebase/server";
+import { OrdersManager } from "../../components/orders-manager";
 
 const db = getFirestore(app);
 const orderRef = await db.collection("orders");
 ---
 
 <Layout title="Mariez Cafe Admin">
-  <h1>Hello Admin</h1>
-  <button id="batch-upload-button">add data to db</button>
+  <OrdersManager client:load />
 </Layout>
+
+<style is:global>
+  /* #fdeee2 */
+
+  .omw {
+    padding: 1rem;
+    max-width: 1024px;
+    margin: 0 auto;
+  }
+
+  .omw_body {
+    display: flex;
+    gap: 1rem;
+  }
+
+  .omw_body h3 {
+    font-size: 1.5rem;
+  }
+
+  .omw_body__current {
+    flex: 10;
+  }
+
+  .omw_body__fulfilled {
+    flex: 6;
+  }
+
+  .sep {
+    width: 1px;
+    height: 100%;
+    min-height: calc(100svh - 2rem);
+    background-color: #5b3720;
+  }
+
+  .o_card {
+    padding: 0.5rem;
+    background: #fdeee2;
+    border: 1px solid #914f26;
+    border-radius: 10px;
+    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.6);
+  }
+
+  .o_card__header {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .o_card__header button {
+    padding: 0.5rem 1.2rem;
+    border: 1px solid #914f26;
+    border-radius: 4px;
+    color: #5b3720;
+    cursor: pointer;
+    background-color: #fbfbfb;
+  }
+
+  .o_card__header button:hover {
+    background-color: #f3f3f3;
+  }
+
+  .o_card__sub {
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .o_card__title {
+    margin: 0;
+  }
+
+  .o_card__options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .o_card__option {
+    flex: 1;
+    min-width: 125px;
+  }
+
+  .o_card__option h5,
+  p {
+    margin: 0;
+    padding-top: 0.25rem;
+  }
+
+  @media (max-width: 768px) {
+    .omw_body {
+      flex-direction: column;
+    }
+    .sep {
+      height: 1px;
+      min-height: 1px;
+      width: 100%;
+    }
+  }
+</style>
