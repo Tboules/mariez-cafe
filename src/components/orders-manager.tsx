@@ -1,39 +1,74 @@
 import React from "react";
 import type { Order } from "../types";
-
-const SAMPLE_ORDER: Order = {
-  createdAt: new Date(Date.now()),
-  orderItemId: "",
-  orderItemName: "Spanish Latte",
-  orderedBy: "Tony Boules",
-  status: "ordered",
-  orderOptions: {
-    milk: "Oat",
-    refresherType: null,
-    sweetness: "Regular",
-    toppings: "Whipped Cream",
-    type: "Iced",
-  },
-};
+import {
+  collection,
+  query,
+  doc,
+  updateDoc,
+  onSnapshot,
+} from "firebase/firestore";
+import { clientDb } from "../firebase/client";
 
 export function OrdersManager() {
+  const [orders, setOrders] = React.useState<Order[]>([]);
+  const [fulfilled, setFulfilled] = React.useState<Order[]>([]);
+
+  React.useEffect(() => {
+    const q = query(collection(clientDb, "orders"));
+    const unsub = onSnapshot(q, (snap) => {
+      const tempOrders: Order[] = [];
+      const tempFulfilled: Order[] = [];
+
+      snap.forEach((doc) => {
+        const t = doc.data() as Order;
+        t.id = doc.id;
+
+        if (t.status == "ordered") {
+          tempOrders.push(t);
+        } else {
+          tempFulfilled.push(t);
+        }
+      });
+
+      setOrders(tempOrders);
+      setFulfilled(tempFulfilled);
+    });
+
+    return unsub;
+  }, []);
+
   return (
     <div className="omw">
       <div className="omw_body">
         <div className="omw_body__current">
           <h3>Current Orders</h3>
 
-          <OrderedCard order={SAMPLE_ORDER} />
+          {orders.reverse().map((order) => (
+            <OrderedCard key={order.id} order={order} />
+          ))}
         </div>
 
         <div className="sep" />
 
         <div className="omw_body__fulfilled">
           <h3>Fulfilled</h3>
+
+          {fulfilled.reverse().map((fulfilledOrder) => (
+            <OrderedCard key={fulfilledOrder.id} order={fulfilledOrder} />
+          ))}
         </div>
       </div>
     </div>
   );
+}
+
+async function fulfillOrder(o: Order) {
+  console.log(o);
+  if (!o.id) return;
+
+  const orderRef = doc(clientDb, "orders", o.id);
+  o.status = "fulfilled";
+  await updateDoc(orderRef, o);
 }
 
 function OrderedCard({ order }: { order: Order }) {
@@ -44,22 +79,28 @@ function OrderedCard({ order }: { order: Order }) {
           <h4 className="o_card__title">{order.orderItemName}</h4>
           <p className="o_card__by">{order.orderedBy}</p>
         </div>
-        <button>Done</button>
+        {order.status == "ordered" && (
+          <button onClick={() => fulfillOrder(order)}>Done</button>
+        )}
       </div>
 
-      <h4 className="o_card__sub">Options:</h4>
-      <div className="o_card__options">
-        {Object.entries(order.orderOptions).map(([k, v]) => (
-          <React.Fragment key={k}>
-            {v && (
-              <div className="o_card__option">
-                <h5>{k}:</h5>
-                <p>{v}</p>
-              </div>
-            )}
-          </React.Fragment>
-        ))}
-      </div>
+      {order.status == "ordered" && (
+        <>
+          <h4 className="o_card__sub">Options:</h4>
+          <div className="o_card__options">
+            {Object.entries(order.orderOptions).map(([k, v]) => (
+              <React.Fragment key={k}>
+                {v && (
+                  <div className="o_card__option">
+                    <h5>{k}:</h5>
+                    <p>{v}</p>
+                  </div>
+                )}
+              </React.Fragment>
+            ))}
+          </div>
+        </>
+      )}
     </div>
   );
 }
