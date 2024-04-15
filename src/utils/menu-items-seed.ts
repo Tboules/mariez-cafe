@@ -1,6 +1,4 @@
-import type { MenuItem } from "../types";
-
-export const menuItems: MenuItem[] = [
+export const menuItems: any[] = [
   {
     name: "Toffee Nut Latte",
     description:
