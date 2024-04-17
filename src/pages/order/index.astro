@@ -21,53 +21,57 @@ const db = getFirestore(app);
 const drinkRef = await db.collection("menuItems").doc(drinkId).get();
 
 const drink = (await drinkRef.data()) as MenuItem | undefined;
+if(drink) {
+  drink.id = drinkRef.id
+}
+
 
 if (!drink) {
   return Astro.redirect("/");
 }
 
-console.log(drink);
+
 ---
+<order-form data-message={JSON.stringify(drink)}>
+  <Layout title="Order Page">
+    <main class="wrapper">
+      <h1>{drink.name}</h1>
+      {drink.drinkTypes == "Hot" && <h4>*Hot Drink</h4>}
+      {drink.drinkTypes == "Iced" && <h4>*Iced Drink</h4>}
 
-<Layout title="Order Page">
-  <main class="wrapper">
-    <h1>{drink.name}</h1>
-    {drink.drinkTypes == "Hot" && <h4>*Hot Drink</h4>}
-    {drink.drinkTypes == "Iced" && <h4>*Iced Drink</h4>}
+      <form id="order-form">
+        <div class="form-input">
+          <label>Ordered By:</label>
+          <input type="text" name="orderedBy" placeholder="Your Name" />
+        </div>
+        {
+          drink.drinkTypes == "Either" && (
+            <div class="form-input">
+              <label>Drink Type:</label>
+              <select name="orderOptionsType">
+                {Object.values(ORDER_OPTIONS_TYPE).map((type) => (
+                  <option value={type}>{type}</option>
+                ))}
+              </select>
+            </div>
+          )
+        }
 
-    <form action="">
-      <div class="form-input">
-        <label>Ordered By:</label>
-        <input type="text" name="orderedBy" placeholder="Your Name" />
-      </div>
-      {
-        drink.drinkTypes == "Either" && (
-          <div class="form-input">
-            <label>Drink Type:</label>
-            <select name="orderOptionsType">
-              {Object.values(ORDER_OPTIONS_TYPE).map((type) => (
-                <option value={type}>{type}</option>
-              ))}
-            </select>
-          </div>
-        )
-      }
+        {
+          drink.milk && (
+            <div class="form-input">
+              <label>Milk:</label>
+              <select name="orderOptionsMilk">
+                {Object.values(ORDER_OPTIONS_MILK).map((milkType) => (
+                  <option value={milkType}>{milkType}</option>
+                ))}
+              </select>
+            </div>
+          )
+        }
 
-      {
-        drink.milk == true && (
-          <div class="form-input">
-            <label>Milk:</label>
-            <select name="orderOptionsMilk">
-              {Object.values(ORDER_OPTIONS_MILK).map((milkType) => (
-                <option value={milkType}>{milkType}</option>
-               ))}
-            </select>
-          </div>
-        )
-      }
-
-      {
-          drink.isRefresher == true && (
+        {
+          drink.isRefresher && (
             <div class="form-input">
               <label>Base:</label>
               <select name="orderOptionsRefresher">
@@ -77,52 +81,116 @@ console.log(drink);
               </select>
             </div>
           )
-      }
+        }
 
-      {
-        drink.isRefresher == null && (
+        {
+          !drink.isRefresher && (
+              <div class="form-input">
+              <label>Sweetness:</label>
+              <select name="orderOptionsSweetness">
+                {
+                  Object.values(ORDER_OPTIONS_SWEETNESS).map((sweetnessLevel) => (
+                    <option value={sweetnessLevel}>{sweetnessLevel}</option>
+                  ))
+                }
+              </select>
+            </div>
+          )
+        }
+
+        {
+          !drink.isTea && (
             <div class="form-input">
-            <label>Sweetness:</label>
-            <select name="orderOptionsSweetness">
+            <label>Toppings:</label>
+            <select name="orderOptionsToppings">
               {
-                Object.values(ORDER_OPTIONS_SWEETNESS).map((sweetnessLevel) => (
-                  <option value={sweetnessLevel}>{sweetnessLevel}</option>
+                Object.values(ORDER_OPTIONS_TOPPINGS).map((toppings) => (
+                  <option value={toppings}>{toppings}</option>
                 ))
               }
             </select>
           </div>
-        )
-      }
+          )
+        }
+        <button class="button" type="submit">Submit</button>
+      </form>
+    </main>
+  </Layout>
 
-      {
-        drink.isTea == null && (
-          <div class="form-input">
-          <label>Toppings:</label>
-          <select name="orderOptionsToppings">
-            {
-              Object.values(ORDER_OPTIONS_TOPPINGS).map((toppings) => (
-                <option value={toppings}>{toppings}</option>
-              ))
-            }
-          </select>
-        </div>
-        )
-      }
-      <button class="button">Submit</button>
-    </form>
-  </main>
-</Layout>
+</order-form>
+
+<script>
+  import type { MenuItem, Order, OrderOptionsType, OrderOptionsMilk, OrderOptionsRefresher, OrderOptionsToppings, OrderOptionsSweetness } from "../../types";
+  import { clientDb } from "../../firebase/client";
+  import { collection, addDoc } from "firebase/firestore";
+
+
+  class OrderForm extends HTMLElement {
+    constructor() {
+      super();
+      const orderForm = document.getElementById('order-form') as HTMLFormElement;
+      const drink = JSON.parse(this.dataset.message ?? '') as MenuItem;
+
+      orderForm?.addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        const formData = new FormData(orderForm)
+
+        const orderedBy = formData.get('orderedBy') as string
+        
+        if(orderedBy == ''){
+          alert('Name must be filled out')
+          return;
+        }
+
+
+        const type = formData.get('orderOptionsType') as OrderOptionsType | null;
+        const milk = formData.get('orderOptionsMilk') as OrderOptionsMilk | null;
+        const refresherType = formData.get('orderOptionsRefresher') as OrderOptionsRefresher | null;
+        const sweetness = formData.get('orderOptionsSweetness') as OrderOptionsSweetness | null;
+        const toppings = formData.get('orderOptionsToppings') as OrderOptionsToppings | null;
+
+        const order:Order = {
+          orderItemId: drink.id,
+          orderItemName: drink.name,
+          orderedBy,
+          status: 'ordered',
+          createdAt: new Date(Date.now()),
+          orderOptions: {
+            type,
+            milk,
+            refresherType,
+            sweetness,
+            toppings
+          }
+        }
+
+
+        const docRef = await addDoc(collection(clientDb, 'orders'), order);
+
+        
+        window.location.replace(`/thankyou?orderId=${docRef.id}`)
+      })
+
+    }
+  }
+
+  customElements.define('order-form', OrderForm);
+</script>
+
 
 <style>
   .wrapper {
     margin: 0 auto;
     max-width: 900px;
     padding: 1rem;
+    space
   }
   .form-input {
     display: flex;
     flex-direction: column;
-    /* background-color: #fdeee2; */
+    gap: .5rem;
+    margin: .75rem 0;
   }
 
   .button {
@@ -131,6 +199,7 @@ console.log(drink);
     border-radius: 10px;
     color: #d9bea9;
     width: 100%;
+<<<<<<< HEAD
     padding: 0.25em 0.25em;
     margin: 10px;
   }
@@ -158,5 +227,11 @@ console.log(drink);
 
   }
 
+=======
+    padding: .5rem;
+  }
+
+  
+>>>>>>> main
 
 </style>
