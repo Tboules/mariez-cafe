@@ -1,5 +1,14 @@
 export type ObjectValues<T> = T[keyof T];
 
+export const DRINK_CATEGORIES = {
+  latte: 1,
+  nonCoffee: 2,
+  matcha: 3,
+  refresher: 4,
+} as const;
+
+export type DrinkCategory = ObjectValues<typeof DRINK_CATEGORIES>;
+
 export const MENU_ITEM_DRINK_TYPES = {
   iced: "Iced",
   hot: "Hot",
@@ -17,6 +26,7 @@ export type MenuItem = {
   milk: boolean;
   isRefresher?: boolean;
   isTea?: boolean;
+  category: DrinkCategory;
 };
 
 export const ORDER_STATUS = {

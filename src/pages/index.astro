@@ -2,14 +2,18 @@
 import { getFirestore } from "firebase-admin/firestore";
 import Layout from "../layouts/Layout.astro";
 import { app } from "../firebase/server";
-import type { MenuItem } from "../types";
+import { DRINK_CATEGORIES, type MenuItem } from "../types";
 
 const db = getFirestore(app);
 
 const menuItemsRef = db.collection("menuItems");
 
 const menuItemsSnapshot = await menuItemsRef.get();
-const menuItems: MenuItem[] = [];
+
+const lattes: MenuItem[] = [];
+const nonCoffees: MenuItem[] = [];
+const matchas: MenuItem[] = [];
+const refreshers: MenuItem[] = [];
 
 menuItemsSnapshot.forEach((doc) => {
   const menuItem = {
@@ -17,7 +21,21 @@ menuItemsSnapshot.forEach((doc) => {
     id: doc.id,
   } as MenuItem;
 
-  menuItems.push(menuItem);
+  switch (menuItem.category) {
+    case DRINK_CATEGORIES.latte:
+      lattes.push(menuItem);
+      break;
+    case DRINK_CATEGORIES.nonCoffee:
+      nonCoffees.push(menuItem);
+      break;
+    case DRINK_CATEGORIES.matcha:
+      matchas.push(menuItem);
+      break;
+    case DRINK_CATEGORIES.refresher:
+      refreshers.push(menuItem);
+    default:
+      break;
+  }
 });
 ---
 
@@ -28,18 +46,71 @@ menuItemsSnapshot.forEach((doc) => {
     </div>
   </header>
 
-  <ul class="menu-item-list">
-    {
-      menuItems.map((item) => (
-        <li class="menu-item">
-          <a href={`/order?drinkId=${item.id}`}>
-            <h3>{item.name}</h3>
-            <p>{item.description}</p>
-          </a>
-        </li>
-      ))
-    }
-  </ul>
+  <div>
+    <div class="container">
+      <h3>Lattes:</h3>
+      <ul class="menu-item-list">
+        {
+          lattes.map((item) => (
+            <li class="menu-item">
+              <a href={`/order?drinkId=${item.id}`}>
+                <h3>{item.name}</h3>
+                <p>{item.description}</p>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+
+    <div class="container">
+      <h3>Non-Coffees:</h3>
+      <ul class="menu-item-list">
+        {
+          nonCoffees.map((item) => (
+            <li class="menu-item">
+              <a href={`/order?drinkId=${item.id}`}>
+                <h3>{item.name}</h3>
+                <p>{item.description}</p>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+
+    <div class="container">
+      <h3>Matcha:</h3>
+      <ul class="menu-item-list">
+        {
+          matchas.map((item) => (
+            <li class="menu-item">
+              <a href={`/order?drinkId=${item.id}`}>
+                <h3>{item.name}</h3>
+                <p>{item.description}</p>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+
+    <div class="container">
+      <h3>Refreshers:</h3>
+      <ul class="menu-item-list">
+        {
+          refreshers.map((item) => (
+            <li class="menu-item">
+              <a href={`/order?drinkId=${item.id}`}>
+                <h3>{item.name}</h3>
+                <p>{item.description}</p>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
 
   <!-- <footer><p>Footer</p></footer> -->
 </Layout>
@@ -61,7 +132,7 @@ menuItemsSnapshot.forEach((doc) => {
     max-width: 1100px;
     margin: 0 auto;
     display: grid;
-    margin-bottom: 4rem;
+    margin-bottom: 1rem;
   }
 
   .menu-item {
